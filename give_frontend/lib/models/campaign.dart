@@ -1,5 +1,5 @@
 class Campaign {
-  final String id;
+ 
   final String title;
   final String ngoName;
   final String category;
@@ -9,8 +9,7 @@ class Campaign {
   final int donorCount;
   final int daysLeft;
 
-  const Campaign({
-    required this.id,
+   const Campaign({
     required this.title,
     required this.ngoName,
     required this.category,
@@ -20,4 +19,5 @@ class Campaign {
     required this.donorCount,
     required this.daysLeft,
   });
+
 }

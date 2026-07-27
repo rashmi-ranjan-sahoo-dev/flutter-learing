@@ -8,6 +8,7 @@ class AppTheme {
       seedColor: const Color(0xFF176B5B),
       primary: const Color(0xFF176B5B),
       secondary: const Color(0xFFF5A623),
+      surface: const Color(0xFFFFFCF8)
     )
   );
 }

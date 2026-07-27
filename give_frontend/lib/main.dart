@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'core/theme/app_theme.dart';
-import 'data/mock_campaigns.dart';
+import 'screens/home_screen.dart';
 
 void main() {
   runApp(const GiveApp());
@@ -14,30 +14,32 @@ class GiveApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'CareBridge',
+      title: 'GiveApp',
       theme: AppTheme.lightTheme,
-      home: const SetupCheckScreen(),
-    );
-  }
-}
-
-class SetupCheckScreen extends StatelessWidget {
-  const SetupCheckScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final campaign = mockCampaigns.first;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('CareBridge'),
-      ),
-      body: Center(
-        child: Text(
-          'Setup complete!\\n\\nMock campaign: ${campaign.title}',
-          textAlign: TextAlign.center,
-        ),
+      home: const Scaffold(
+        body: HomeScreen()
       ),
     );
   }
 }
+
+// class SetupCheckScreen extends StatelessWidget {
+//   const SetupCheckScreen({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final campaign = mockCampaigns.first;
+
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('CareBridge'),
+//       ),
+//       body: Center(
+//         child: Text(
+//           'Setup complete!\\n\\nMock campaign: ${campaign.title}',
+//           textAlign: TextAlign.center,
+//         ),
+//       ),
+//     );
+//   }
+// }
