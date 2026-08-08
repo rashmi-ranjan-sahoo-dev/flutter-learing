@@ -15,7 +15,6 @@ class _HeroSectionWidgetState extends ConsumerState<HeroSectionWidget> {
   late PageController _pageController;
   Timer? _timer;
 
-  // Set a large starting page so the user can swipe backward immediately if desired
   static const int _initialPage = 10000;
 
   @override
@@ -25,13 +24,11 @@ class _HeroSectionWidgetState extends ConsumerState<HeroSectionWidget> {
       initialPage: _initialPage,
       viewportFraction: 1.0,
     );
-    _startAutoScroll(); // moved into its own method — see note below
+    _startAutoScroll();
   }
 
   void _startAutoScroll() {
-    _timer
-        ?.cancel(); // FIX 1: cancel any existing timer before starting a new one,
-    // prevents multiple timers stacking if this ever runs twice
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       if (_pageController.hasClients) {
         _pageController.nextPage(
@@ -58,14 +55,19 @@ class _HeroSectionWidgetState extends ConsumerState<HeroSectionWidget> {
       return const SizedBox(height: 220);
     }
 
+    final width = MediaQuery.of(context).size.width;
+    final height = width >= 900
+        ? 320.0
+        : width >= 600
+        ? 260.0
+        : 220.0;
+
     return SizedBox(
-      height: 220,
+      height: height,
       width: double.infinity,
       child: PageView.builder(
         controller: _pageController,
-        // Omit itemCount so PageView can slide infinitely in both directions
         itemBuilder: (context, index) {
-          // Use modulo operator to loop over actual card models
           final actualIndex = index % heroCards.length;
           final cardData = heroCards[actualIndex];
 
@@ -80,78 +82,88 @@ class _HeroSectionWidgetState extends ConsumerState<HeroSectionWidget> {
     HeroCardModel card,
     Color primaryColor,
   ) {
-    return Stack(
-      children: [
-        // 1. Background Image (Full Width)
-        Positioned.fill(
-          child: Image.network(
-            card.imageUrl,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) =>
-                Container(color: Colors.grey.shade300),
-          ),
-        ),
+    final width = MediaQuery.of(context).size.width;
+    final horizontalPadding = width >= 900 ? 8.0 : 0.0;
 
-        // 2. Dark Gradient Overlay
-        Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.black.withOpacity(0.8),
-                  Colors.black.withOpacity(0.2),
-                  Colors.transparent,
-                ],
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.network(
+                card.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    Container(color: Colors.grey.shade300),
               ),
             ),
-          ),
-        ),
-
-        // 3. Title & Action Button
-        Positioned(
-          bottom: 16,
-          left: 16,
-          right: 16,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                card.title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.black.withValues(alpha: 0.8),
+                      Colors.black.withValues(alpha: 0.25),
+                      Colors.transparent,
+                    ],
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
                   ),
                 ),
-                onPressed: () {
-                  // Action when tapping hero button
-                },
-                child: Text(
-                  card.btnText,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Positioned(
+              bottom: 16,
+              left: 16,
+              right: 16,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 520),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        card.title,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                        ),
+                        onPressed: () {},
+                        child: Text(
+                          card.btnText,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

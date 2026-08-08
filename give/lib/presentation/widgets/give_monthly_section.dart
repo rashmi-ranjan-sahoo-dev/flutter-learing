@@ -4,61 +4,69 @@ import '../riverpod/store/give_monthly_store.dart';
 import '../../data/models/give_monthly_model.dart';
 
 class GiveMonthlySectionWidget extends ConsumerWidget {
-  const GiveMonthlySectionWidget({super.key}) : super();
+  const GiveMonthlySectionWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Reading  data form Riverpod provider
-
     final giveMonthly = ref.watch(giveMonthlyProvider);
+    final primaryColor = Theme.of(context).colorScheme.primary;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Header Section
-          const Text(
-            "Give Monthly",
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Text(
+          'Give Monthly',
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Create sustained impact. Support verified projects.\nGet regular updates on your contributions.',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 16, color: primaryColor, height: 1.4),
+        ),
+        const SizedBox(height: 24),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = constraints.maxWidth >= 900;
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: giveMonthly.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: isWide ? 2 : 1,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 20,
+                childAspectRatio: isWide ? 1.12 : 0.95,
+              ),
+              itemBuilder: (context, index) {
+                final card = giveMonthly[index];
+                return GiveMonthlyCard(card: card);
+              },
+            );
+          },
+        ),
+        const SizedBox(height: 24),
+        Center(
+          child: ElevatedButton(
+            onPressed: null,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+            child: const Text(
+              'View More Missions',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-          const SizedBox(height: 8),
-          const Text(
-            "Create sustained impact. Support verified Projects. \nGet regular updates on your contributions.",
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, color: Colors.grey, height: 1.4),
-          ),
-          const SizedBox(height: 24),
-
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: giveMonthly.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 20),
-            itemBuilder: (context, index) {
-              final card = giveMonthly[index];
-              return GiveMonthlyCard(card: card);
-            },
-          ),
-
-          const SizedBox(height: 24),
-
-          Center(
-            child: ElevatedButton(onPressed: null, child: Text('View More Missions',
-  
-            style: TextStyle(
-              color: Colors.black,
-              // backgroundColor: Colors.white,
-               fontSize: 20,
-               height: 2,
-            )))
-          )
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -77,7 +85,7 @@ class GiveMonthlyCard extends ConsumerWidget {
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black,
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -86,16 +94,17 @@ class GiveMonthlyCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top Image Section
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             child: Stack(
               children: [
-                Image.network(
-                  card.imageUrl,
-                  height: 180,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+                AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: Image.network(
+                    card.imageUrl,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
                 ),
                 Positioned.fill(
                   child: Container(
@@ -103,7 +112,7 @@ class GiveMonthlyCard extends ConsumerWidget {
                       gradient: LinearGradient(
                         colors: [
                           Colors.transparent,
-                          Colors.black.withOpacity(0.8),
+                          Colors.black.withValues(alpha: 0.75),
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
@@ -111,7 +120,6 @@ class GiveMonthlyCard extends ConsumerWidget {
                     ),
                   ),
                 ),
-                // Badge
                 Positioned(
                   top: 12,
                   left: 12,
@@ -134,23 +142,24 @@ class GiveMonthlyCard extends ConsumerWidget {
                     ),
                   ),
                 ),
-                // Title and Tag
                 Positioned(
                   bottom: 12,
                   left: 12,
                   right: 12,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         card.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      const SizedBox(height: 4),
                       Text(
                         card.tag,
                         style: const TextStyle(
@@ -165,25 +174,25 @@ class GiveMonthlyCard extends ConsumerWidget {
               ],
             ),
           ),
-
-          // Card Content
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 RichText(
+                  maxLines: 4,
+                  overflow: TextOverflow.ellipsis,
                   text: TextSpan(
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.black87,
-                      height: 1.3,
+                      height: 1.4,
                     ),
                     children: [
                       TextSpan(text: card.description),
                       TextSpan(
                         text: card.highlight,
-                        style:  TextStyle(
+                        style: TextStyle(
                           color: primaryColor,
                           fontWeight: FontWeight.bold,
                         ),
@@ -192,21 +201,17 @@ class GiveMonthlyCard extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // Button
                 SizedBox(
                   width: double.infinity,
-                  height: 48,
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Trigger Riverpod actions here if needed
-                    },
+                    onPressed: () {},
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:primaryColor,
+                      backgroundColor: primaryColor,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     child: const Text(
                       'Pledge Monthly',
